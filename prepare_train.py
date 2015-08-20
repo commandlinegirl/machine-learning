@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 
 ### 1. IMPORT DATA
 train = pd.read_csv('train.csv', header=0)
-test = pd.read_csv('test.csv', header=0)
 
 # percentage of women in each class
 #print 'Percentage of women in each class'
@@ -19,12 +18,7 @@ test = pd.read_csv('test.csv', header=0)
 train['Gender'] = train['Sex'].map({'male':0, 'female':1})
 
 # Add PortNum column with embarkation port represented numerically
-train['PortNum'] = train['Embarked'].map({
-    'S': 0,
-    'C': 1,
-    'Q': 2,
-    'nan':3
-    })
+train['PortNum'] = train['Embarked'].map({ 'S': 0, 'C': 1, 'Q': 2, 'nan':3 })
 train.loc[ (train.PortNum.isnull())] = 3
 
 # Fill in age. Use median ages by class and gender
@@ -33,6 +27,12 @@ median_ages = train.groupby(['Pclass', 'Gender']).median()
 median_ages_age = median_ages['Age']
 train['AgeFill'] = train['Age']
 
+# Fill in fare
+train['FareFill'] = train['Fare']
+median_fares = train.groupby('Pclass')['Fare'].median()
+for i in range(1, 4): 
+        train.loc[ (train.Fare.isnull()) & (train.Pclass == i), 'FareFill'] = median_fares[i]
+          
 for i in range(1, 4):
     for j in range(0, 2):
         train.loc[ (train.Age.isnull()) & (train.Pclass == i) & (train.Gender == j), 'AgeFill'] = median_ages_age[i][j]
@@ -45,7 +45,7 @@ train['Age*Class'] = train.AgeFill * train.Pclass
 # train.dtypes[train.dtypes.map(lambda x: x=='object')]
 
 # Drop not used columns
-train = train.drop(['Name', 'Sex', 'Ticket', 'Cabin', 'Embarked', 'Age'], axis=1) 
+train = train.drop(['Name', 'Sex', 'Ticket', 'Cabin', 'Embarked', 'Age', 'PassengerId', 'Fare'], axis=1) 
 # (712 rows still contain at least one NA value)
 
 # Print type info
