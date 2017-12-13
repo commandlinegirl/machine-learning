@@ -1,5 +1,3 @@
-My submissions to kaggle data science competitions:
-
 ## Competitions
 
 ### [Leaf classification](https://www.kaggle.com/c/leaf-classification/)
